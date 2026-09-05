@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0a0e14">
+  <meta name="description" content="Build your own outpost on a flat lunar world. An open-ended 3D block-building sandbox with eight materials and a universe of possibilities.">
+  <title>Moonforge — Lunar building sandbox</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%230c1119'/%3E%3Cpath d='M44 10a23 23 0 1 0 10 34A23 23 0 0 1 44 10' fill='%23d6f690'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="./style.css">
+  <script type="module" src="./game.js"></script>
+</head>
+<body>
+  <canvas id="world" aria-label="Interactive 3D lunar building world. Click to place blocks. Drag to orbit. Press H for all controls." tabindex="0"></canvas>
+  <div id="loading" class="loading-screen"><div class="loading-moon"></div><strong>MOONFORGE</strong><span>Preparing your corner of the moon…</span></div>
+  <div class="hud">
+    <header class="topbar">
+      <div class="brand"><svg class="brand-mark" viewBox="0 0 40 40" aria-hidden="true"><path d="M28 3a18 18 0 1 0 9 26A18 18 0 0 1 28 3Z" fill="currentColor"/><path d="M30 9v8m-4-4h8" stroke="currentColor" stroke-width="1.5"/></svg><div><h1>MOONFORGE</h1><p>A LUNAR SANDBOX</p></div></div>
+      <div class="mode-switch interactive" role="group" aria-label="Camera mode"><button id="build-mode" class="active" aria-pressed="true"><svg viewBox="0 0 24 24"><path d="m12 3 8 4.5v9L12 21l-8-4.5v-9L12 3Zm0 9 8-4.5M12 12 4 7.5M12 12v9"/></svg>Build <kbd>B</kbd></button><button id="explore-mode" aria-pressed="false"><svg viewBox="0 0 24 24"><path d="m4 20 6-16 4 6 6 4-16 6Zm6-16 4 10 6 0M4 20l10-6"/></svg>Fly <kbd>F</kbd></button></div>
+      <div class="top-actions interactive"><span class="creative-badge">CREATIVE<span>∞</span></span><button id="help-button" class="icon-button" title="Controls (H)" aria-label="Show controls"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 1 1 4 2c-1 .5-1.5 1-1.5 2M12 16h.01"/></svg></button><button id="reset-button" class="icon-button" title="New world" aria-label="Start a new world"><svg viewBox="0 0 24 24"><path d="M4 9a8 8 0 1 1-.2 6M4 4v5h5"/></svg></button></div>
+    </header>
+    <div class="sector"><span class="eyebrow">CONSTRUCTION ZONE</span><div>Tranquility Base <span>01</span></div><p>FLAT WORLD <span>·</span> UNLIMITED MATERIALS</p></div>
+    <aside class="tools interactive" aria-label="Building tools"><button class="tool active" id="place-tool" title="Place blocks (Q)" aria-label="Place blocks" aria-pressed="true"><svg viewBox="0 0 24 24"><path d="m12 3 8 4.5v9L12 21l-8-4.5v-9L12 3Zm0 9 8-4.5M12 12 4 7.5M12 12v9"/></svg><span>Place</span></button><button class="tool" id="erase-tool" title="Remove blocks (E)" aria-label="Remove blocks" aria-pressed="false"><svg viewBox="0 0 24 24"><path d="m15 3 6 6-11 11H7l-5-5L15 3ZM6 11l7 7M10 20h11"/></svg><span>Erase</span></button><div class="tool-divider"></div><button class="tool" id="undo-button" title="Undo (Ctrl / ⌘ Z)" aria-label="Undo" disabled><svg viewBox="0 0 24 24"><path d="m9 5-5 5 5 5M4 10h10a6 6 0 0 1 0 12" transform="translate(0 -2)"/></svg><span>Undo</span></button><button class="tool" id="home-button" title="Return to base (R)" aria-label="Return camera to base"><svg viewBox="0 0 24 24"><path d="m3 10 9-7 9 7M5 9v12h14V9M9 21v-7h6v7"/></svg><span>Home</span></button></aside>
+    <div class="world-note"><span class="world-note-line"></span><span>128 × 128 SURFACE<br>48 BLOCKS HIGH</span></div>
+    <div id="crosshair" aria-hidden="true"><i></i><b></b></div>
+    <div id="fly-prompt" class="fly-prompt interactive" hidden><strong>Take a look around</strong><span>Click the world to fly. Press Esc to release your cursor.</span><button id="return-build">Back to building</button></div>
+    <div id="toast" role="status" class="toast"></div>
+    <div class="bottom-bar">
+      <div class="location-readout"><div class="compass" aria-hidden="true"><span>N</span><svg id="compass-arrow" viewBox="0 0 40 40"><path d="m20 4 8 27-8-5-8 5Z" fill="currentColor"/></svg></div><div><span class="eyebrow">LUNAR SURFACE</span><p id="coordinates">X 000 <span>/</span> Z 000</p><small id="mode-caption">Orbital view</small></div></div>
+      <section class="inventory interactive" aria-label="Block inventory"><div class="inventory-label"><span id="selected-name">Lunar stone</span><span class="palette-caption">BLOCK PALETTE <b>1–8</b></span></div><div id="hotbar" class="hotbar"></div><p class="controls-hint" id="controls-hint"><span>Click <b>place</b></span><i>·</i><span>Right-click <b>erase</b></span><i>·</i><span>Drag <b>orbit</b></span><i>·</i><span>Scroll <b>zoom</b></span></p></section>
+      <div class="build-readout"><span class="eyebrow">BLOCKS PLACED</span><p id="block-count">0000</p><span class="session-label">SESSION WORLD</span></div>
+    </div>
+    <div class="touch-flight interactive" id="touch-flight" hidden><div class="dpad"><button data-move="KeyW" aria-label="Move forward">↑</button><button data-move="KeyA" aria-label="Move left">←</button><button data-move="KeyS" aria-label="Move backward">↓</button><button data-move="KeyD" aria-label="Move right">→</button></div><div class="flight-height"><button data-move="Space" aria-label="Fly up">+</button><button data-move="ShiftLeft" aria-label="Fly down">−</button></div><button id="touch-action" aria-label="Use selected tool">Place</button></div>
+  </div>
+  <dialog id="help-dialog"><button class="dialog-close" aria-label="Close controls">×</button><span class="eyebrow">FIELD GUIDE / 01</span><h2>Make yourself at home.</h2><p>A flat moon. Eight materials. Room to build something of your own.</p><div class="help-columns"><section><h3>Build mode</h3><dl><dt>Place a block</dt><dd>Click / tap</dd><dt>Remove a block</dt><dd>Right-click / Erase tool</dd><dt>Orbit your build</dt><dd>Drag</dd><dt>Move across the moon</dt><dd>Shift + drag / two fingers</dd><dt>Zoom in or out</dt><dd>Scroll / pinch</dd><dt>Choose a block</dt><dd>1–8 / palette</dd><dt>Switch place / erase</dt><dd>Q / E</dd><dt>Undo / redo</dt><dd>Ctrl or ⌘ Z / Shift Z</dd></dl></section><section><h3>Fly mode</h3><dl><dt>Enter / leave fly mode</dt><dd>F / B</dd><dt>Look around</dt><dd>Move mouse / drag</dd><dt>Move</dt><dd>W A S D</dd><dt>Fly up / down</dt><dd>Space / Shift</dd><dt>Fly faster</dt><dd>Ctrl</dd><dt>Release cursor</dt><dd>Esc</dd><dt>Return to base</dt><dd>R</dd></dl><p class="help-note">On a touch screen, use the flight controls. Your world lasts for this session; reloading starts a fresh one.</p></section></div><button class="primary-button" id="help-done">Let's build <span>↗</span></button></dialog>
+  <dialog id="reset-dialog" class="reset-dialog"><span class="eyebrow">A CLEAN SLATE</span><h2>Start a new world?</h2><p>This clears all blocks in your current world. Choose a completely empty surface or bring back the starter outpost.</p><div class="reset-choices"><button id="reset-empty" class="primary-button">Empty moon</button><button id="reset-starter" class="secondary-button">Starter outpost</button></div><button id="reset-cancel" class="text-button">Keep building</button></dialog>
+  <noscript><div class="no-script">Moonforge needs JavaScript enabled to run the game.</div></noscript>
+</body>
+</html>
