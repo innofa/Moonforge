@@ -1,0 +1,16 @@
+{
+  "name": "moonforge",
+  "version": "1.0.0",
+  "private": true,
+  "description": "A lunar voxel sandbox.",
+  "scripts": {
+    "ios": "sh -c 'if [ -d /Applications/Xcode.app/Contents/Developer ]; then export DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer; fi; cap sync ios && cap open ios'"
+  },
+  "dependencies": {
+    "@capacitor/core": "^8.5.3",
+    "@capacitor/ios": "^8.5.3"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^8.5.3"
+  }
+}

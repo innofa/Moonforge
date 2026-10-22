@@ -1,0 +1,12 @@
+{
+  "appId": "com.moonforge.app",
+  "appName": "Moonforge",
+  "webDir": "dist",
+  "backgroundColor": "#090e16",
+  "ios": {
+    "contentInset": "never",
+    "backgroundColor": "#090e16",
+    "scrollEnabled": false,
+    "allowsLinkPreview": false
+  }
+}

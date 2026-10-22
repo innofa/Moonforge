@@ -37,7 +37,18 @@ You need **Python 3** and a browser with **WebGL 2** support. No npm packages or
 
 Keep the terminal running while you play. Press **Ctrl+C** in the terminal to stop the server.
 
-### Play on an iPhone
+### Play from Xcode
+
+Install dependencies once, then open the iOS app in Xcode:
+
+```bash
+npm install
+npm run ios
+```
+
+Choose your iPhone or a simulator in Xcode and press **Run**. The Mac and iPhone need to be unlocked, and the iPhone needs to trust this computer.
+
+### Play on an iPhone in Safari
 
 The Mac and the iPhone need to be on the same Wi-Fi network. Start the server so the phone can reach this computer:
 

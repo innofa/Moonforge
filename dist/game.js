@@ -449,7 +449,10 @@ function showFatal(message) {
 }
 
 updateUI(); updateControlHint();
-const installed = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
-if (/iPhone|iPad|iPod/.test(navigator.userAgent) && !installed) setTimeout(() => toast('Share, then Add to Home Screen for a fullscreen game.'), 1600);
+setTimeout(() => {
+  const nativeApp = window.Capacitor?.isNativePlatform?.() === true;
+  const installed = nativeApp || window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+  if (/iPhone|iPad|iPod/.test(navigator.userAgent) && !installed) toast('Share, then Add to Home Screen for a fullscreen game.');
+}, 1600);
 try { makeThumbnails(); } catch (error) { renderer.setRenderTarget(null); console.warn('Using simple palette swatches.', error); }
 requestAnimationFrame(tick);
