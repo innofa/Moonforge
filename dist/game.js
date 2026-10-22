@@ -7,13 +7,13 @@ const canvas = $('world');
 const touchDevice = window.matchMedia('(pointer: coarse)').matches;
 let renderer;
 try {
-  renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false, powerPreference: 'high-performance', preserveDrawingBuffer: false });
+  renderer = new THREE.WebGLRenderer({ canvas, antialias: !touchDevice, alpha: false, powerPreference: 'high-performance', preserveDrawingBuffer: false });
 } catch (error) {
   showFatal('Your browser could not start the 3D engine. Enable hardware acceleration or try a browser with WebGL 2 support.');
   throw error;
 }
 renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, touchDevice ? 1.5 : 2));
-renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setSize(window.innerWidth, window.innerHeight, false);
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -252,10 +252,11 @@ canvas.addEventListener('pointerdown', event => {
   if (modalOpen) return; event.preventDefault(); canvas.focus({ preventScroll: true }); updatePointer(event);
   if (mode === 'fly' && !pointerLocked && !touchDevice && !fallbackFly) { requestLock(); return; }
   if (pointerLocked) { useTool(event.button === 2 ? 'erase' : tool); return; }
-  canvas.setPointerCapture(event.pointerId); pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
+  if (event.pointerType !== 'touch') canvas.setPointerCapture(event.pointerId);
+  pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
   if (pointers.size === 1) gesture = { x: event.clientX, y: event.clientY, startX: event.clientX, startY: event.clientY, button: event.button, pan: event.shiftKey || event.button === 1, dragged: false };
   if (pointers.size >= 2) { if (gesture) gesture.dragged = true; multiTouch = touchMetrics(); }
-});
+}, { passive: false });
 function touchMetrics() {
   const [a, b] = [...pointers.values()]; if (!a || !b) return null;
   return { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2, distance: Math.hypot(a.x - b.x, a.y - b.y) };
@@ -297,6 +298,8 @@ canvas.addEventListener('pointerup', event => {
 });
 canvas.addEventListener('pointercancel', () => { pointers.clear(); gesture = null; multiTouch = null; document.body.classList.remove('is-dragging'); });
 canvas.addEventListener('pointerleave', () => { if (!pointers.size && mode === 'build') pointerValid = false; });
+canvas.addEventListener('touchmove', event => event.preventDefault(), { passive: false });
+for (const name of ['gesturestart', 'gesturechange', 'gestureend']) document.addEventListener(name, event => event.preventDefault());
 canvas.addEventListener('wheel', event => {
   event.preventDefault();
   if (mode === 'build') orbit.radius = THREE.MathUtils.clamp(orbit.radius * Math.exp(event.deltaY * (event.deltaMode === 1 ? .028 : .0014)), 5, 105);
@@ -359,8 +362,29 @@ for (const button of document.querySelectorAll('[data-move]')) {
   for (const eventName of ['pointerup', 'pointercancel', 'lostpointercapture']) button.addEventListener(eventName, () => keys.delete(button.dataset.move));
 }
 
-function resize() { camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth, innerHeight); }
-window.addEventListener('resize', resize);
+function resize() {
+  const width = canvas.clientWidth || window.innerWidth;
+  const height = canvas.clientHeight || window.innerHeight;
+  if (width < 2 || height < 2) return;
+  camera.aspect = width / height;
+  camera.updateProjectionMatrix();
+  renderer.setSize(width, height, false);
+}
+function fitViewport() {
+  const viewport = window.visualViewport;
+  const root = document.documentElement;
+  root.style.setProperty('--vv-top', `${viewport ? viewport.offsetTop : 0}px`);
+  root.style.setProperty('--vv-width', `${viewport ? viewport.width : window.innerWidth}px`);
+  root.style.setProperty('--vv-height', `${viewport ? viewport.height : window.innerHeight}px`);
+  resize();
+}
+window.addEventListener('resize', fitViewport);
+window.addEventListener('orientationchange', () => setTimeout(fitViewport, 80));
+if (window.visualViewport) {
+  window.visualViewport.addEventListener('resize', fitViewport);
+  window.visualViewport.addEventListener('scroll', fitViewport);
+}
+fitViewport();
 canvas.addEventListener('webglcontextlost', event => { event.preventDefault(); disposed = true; showFatal('The 3D graphics connection was interrupted. Reload to start a fresh world.'); });
 
 // Inventory thumbnails use the actual game geometry and materials.
@@ -425,5 +449,7 @@ function showFatal(message) {
 }
 
 updateUI(); updateControlHint();
+const installed = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+if (/iPhone|iPad|iPod/.test(navigator.userAgent) && !installed) setTimeout(() => toast('Share, then Add to Home Screen for a fullscreen game.'), 1600);
 try { makeThumbnails(); } catch (error) { renderer.setRenderTarget(null); console.warn('Using simple palette swatches.', error); }
 requestAnimationFrame(tick);

@@ -37,6 +37,16 @@ You need **Python 3** and a browser with **WebGL 2** support. No npm packages or
 
 Keep the terminal running while you play. Press **Ctrl+C** in the terminal to stop the server.
 
+### Play on an iPhone
+
+The Mac and the iPhone need to be on the same Wi-Fi network. Start the server so the phone can reach this computer:
+
+```bash
+python3 -m http.server 8000 --bind 0.0.0.0 --directory dist
+```
+
+In Safari on the iPhone, open `http://<your-mac-ip>:8000`. To play fullscreen, tap **Share → Add to Home Screen**, then open **Moonforge** from the home screen. Keep the Mac awake and this terminal running while you play. If macOS asks whether Python may accept incoming connections, allow it.
+
 Use the web server rather than double-clicking `dist/index.html`: the game loads JavaScript modules, which browsers restrict when opened directly from disk. If port 8000 is already in use, change `8000` to `8001` in both the command and browser address.
 
 ### Basic controls

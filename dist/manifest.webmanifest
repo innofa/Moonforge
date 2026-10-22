@@ -1,0 +1,16 @@
+{
+  "name": "Moonforge",
+  "short_name": "Moonforge",
+  "description": "A lunar block-building sandbox.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#090e16",
+  "theme_color": "#0a0e14",
+  "icons": [
+    { "src": "icon-180.png", "sizes": "180x180", "type": "image/png" },
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
+  ]
+}
